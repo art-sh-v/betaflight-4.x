@@ -201,9 +201,12 @@ uint16_t rxGetLinkQualityPercent(void);
 #ifdef USE_RX_RSSI_DBM
 int16_t getRssiDbm(void);
 void setRssiDbm(int16_t newRssiDbm, rssiSource_e source);
+int16_t getRssiDbmInactive(void);
+void setRssiDbmInactive(int16_t newRssiDbm, rssiSource_e source);
 void setRssiDbmDirect(int16_t newRssiDbm, rssiSource_e source);
 int8_t getActiveAntenna(void);
 void setActiveAntenna(int8_t antenna);
+bool getIsDiversity(void);
 #endif //USE_RX_RSSI_DBM
 
 #ifdef USE_RX_RSNR

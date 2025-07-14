@@ -80,7 +80,10 @@ static timeUs_t lastRssiSmoothingUs = 0;
 #ifdef USE_RX_RSSI_DBM
 static int8_t activeAntenna;
 static int16_t rssiDbm = CRSF_RSSI_MIN;    // range: [-130,0]
+static int16_t rssiDbmInactive = CRSF_RSSI_MIN;    // range: [-130,0]
 static int16_t rssiDbmRaw = CRSF_RSSI_MIN; // range: [-130,0]
+static int16_t rssiDbmRawInactive = CRSF_RSSI_MIN; // range: [-130,0]
+static bool diversity = false;
 #endif //USE_RX_RSSI_DBM
 #ifdef USE_RX_RSNR
 static int16_t rsnr = CRSF_SNR_MIN;        // range: [-30,20]
@@ -92,6 +95,7 @@ static pt1Filter_t frameErrFilter;
 static pt1Filter_t rssiFilter;
 #ifdef USE_RX_RSSI_DBM
 static pt1Filter_t rssiDbmFilter;
+static pt1Filter_t rssiDbmInactiveFilter;
 #endif //USE_RX_RSSI_DBM
 #ifdef USE_RX_RSNR
 static pt1Filter_t rsnrFilter;
@@ -387,6 +391,7 @@ void rxInit(void)
 
 #ifdef USE_RX_RSSI_DBM
     pt1FilterInit(&rssiDbmFilter, k);
+    pt1FilterInit(&rssiDbmInactiveFilter, k);
 #endif //USE_RX_RSSI_DBM
 
 #ifdef USE_RX_RSNR
@@ -908,6 +913,10 @@ void updateRSSI(timeUs_t currentTimeUs)
                 pt1FilterUpdateCutoff(&rssiDbmFilter, k2);
                 rssiDbm = pt1FilterApply(&rssiDbmFilter, rssiDbmRaw);
             }
+            if (rssiDbmInactive != rssiDbmRawInactive) {
+                pt1FilterUpdateCutoff(&rssiDbmInactiveFilter, k2);
+                rssiDbmInactive = pt1FilterApply(&rssiDbmInactiveFilter, rssiDbmRawInactive);
+            }
 #endif //USE_RX_RSSI_DBM
 
 #ifdef USE_RX_RSNR
@@ -945,6 +954,16 @@ int16_t getRssiDbm(void)
     return rssiDbm;
 }
 
+int16_t getRssiDbmInactive(void)
+{
+    return rssiDbmInactive;
+}
+
+bool getIsDiversity(void)
+{
+    return diversity;
+}
+
 void setRssiDbm(int16_t rssiDbmValue, rssiSource_e source)
 {
     if (source != rssiSource) {
@@ -952,6 +971,15 @@ void setRssiDbm(int16_t rssiDbmValue, rssiSource_e source)
     }
 
     rssiDbmRaw = rssiDbmValue;
+}
+
+void setRssiDbmInactive(int16_t rssiDbmValue, rssiSource_e source)
+{
+    if (source != rssiSource) {
+        return;
+    }
+    diversity = true;
+    rssiDbmRawInactive = rssiDbmValue;
 }
 
 void setRssiDbmDirect(int16_t newRssiDbm, rssiSource_e source)

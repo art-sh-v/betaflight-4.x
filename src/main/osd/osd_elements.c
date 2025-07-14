@@ -1625,15 +1625,18 @@ static void osdElementRssiDbm(osdElementParms_t *element)
 {
     const int8_t antenna = getActiveAntenna();
     const int16_t osdRssiDbm = getRssiDbm();
-    static bool diversity = false;
+    const int16_t osdRssiDbmInactive = getRssiDbmInactive();
+    const bool diversity = getIsDiversity();
 
-    if (osdRssiDbm < osdConfig()->rssi_dbm_alarm) {
-        element->attr = DISPLAYPORT_SEVERITY_CRITICAL;
+    if (MAX(osdRssiDbm, osdRssiDbmInactive) < osdConfig()->rssi_dbm_alarm) {
+         element->attr = DISPLAYPORT_SEVERITY_CRITICAL;
+    } else
+    if (MIN(osdRssiDbm, osdRssiDbmInactive) < osdConfig()->rssi_dbm_alarm) {
+        element->attr = DISPLAYPORT_SEVERITY_WARNING;
     }
 
-    if (antenna || diversity) {
-        diversity = true;
-        tfp_sprintf(element->buff, "%c%3d:%d", SYM_RSSI, osdRssiDbm, antenna + 1);
+    if (diversity) {
+        tfp_sprintf(element->buff, "%c%3d:%d/%3d", SYM_RSSI, osdRssiDbm, antenna + 1, osdRssiDbmInactive);
     } else {
         tfp_sprintf(element->buff, "%c%3d", SYM_RSSI, osdRssiDbm);
     }
