@@ -1591,6 +1591,11 @@ static void osdElementRtcTime(osdElementParms_t *element)
 #endif // USE_RTC_TIME
 
 #ifdef USE_RX_RSSI_DBM
+/**
+ * Displays the RSSI in dBm, showing both active and inactive antenna values if diversity is enabled.
+ *
+ * Sets the display attribute to critical or warning severity based on the lowest RSSI dBm value compared to the configured alarm threshold. When diversity is enabled, the output includes both antenna RSSI values and the active antenna index; otherwise, only the active RSSI dBm is shown.
+ */
 static void osdElementRssiDbm(osdElementParms_t *element)
 {
     const int8_t antenna = getActiveAntenna();

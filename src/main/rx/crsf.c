@@ -222,6 +222,14 @@ typedef struct crsfPayloadLinkstatisticsTx_s {
 
 static timeUs_t lastLinkStatisticsFrameUs;
 
+/**
+ * Processes a received CRSF Link Statistics frame and updates link quality, RSSI, SNR, antenna, and uplink power metrics.
+ *
+ * Updates the last received timestamp and extracts relevant statistics from the provided frame, including active and inactive antenna RSSI (in dBm), SNR, link quality, RF mode, and uplink TX power. Also updates debug values for monitoring link statistics.
+ * 
+ * @param statsPtr Pointer to the received CRSF Link Statistics frame.
+ * @param currentTimeUs Timestamp (in microseconds) when the frame was received.
+ */
 static void handleCrsfLinkStatisticsFrame(const crsfLinkStatistics_t* statsPtr, timeUs_t currentTimeUs)
 {
     const crsfLinkStatistics_t stats = *statsPtr;
