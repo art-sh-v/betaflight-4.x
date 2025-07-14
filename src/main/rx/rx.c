@@ -279,6 +279,11 @@ static bool serialRxInit(const rxConfig_t *rxConfig, rxRuntimeState_t *rxRuntime
 }
 #endif
 
+/**
+ * Initializes the radio receiver (RX) system, selecting and configuring the appropriate RX provider, setting up channel data, failsafe defaults, RSSI source, and signal quality filters.
+ *
+ * This function determines the RX protocol based on enabled features, initializes function pointers and channel values, configures the ARM switch AUX channel if defined, and calls the relevant provider-specific initialization routines. It also sets up RSSI and signal quality filtering, and establishes the number of RX channels to be used.
+ */
 void rxInit(void)
 {
     if (featureIsEnabled(FEATURE_RX_PARALLEL_PWM)) {
@@ -877,6 +882,13 @@ static void updateRSSIADC(timeUs_t currentTimeUs)
 #endif
 }
 
+/**
+ * Updates the RSSI (Received Signal Strength Indicator) value based on the configured source and applies smoothing filters to RSSI and related signal quality metrics.
+ * 
+ * Depending on the RSSI source, retrieves the latest RSSI value from the appropriate input (RX channel, ADC, or MSP). Applies time-based smoothing to RSSI, RSSI in dBm (including inactive antenna if diversity is enabled), and RSNR values if configured. Resets RSSI to zero if MSP updates are stale.
+ * 
+ * @param currentTimeUs Current time in microseconds, used for timing and smoothing calculations.
+ */
 void updateRSSI(timeUs_t currentTimeUs)
 {
     switch (rssiSource) {
@@ -949,21 +961,38 @@ uint8_t getRssiPercent(void)
 }
 
 #ifdef USE_RX_RSSI_DBM
+/**
+ * Returns the filtered RSSI value in dBm for the active antenna.
+ * @return The current RSSI in dBm.
+ */
 int16_t getRssiDbm(void)
 {
     return rssiDbm;
 }
 
+/**
+ * Returns the filtered RSSI value in dBm for the inactive antenna.
+ * @return Filtered inactive antenna RSSI in dBm.
+ */
 int16_t getRssiDbmInactive(void)
 {
     return rssiDbmInactive;
 }
 
+/**
+ * Returns whether antenna diversity is currently active.
+ * @return True if antenna diversity is enabled; false otherwise.
+ */
 bool getIsDiversity(void)
 {
     return diversity;
 }
 
+/**
+ * Sets the raw RSSI value in dBm for the active antenna if the source matches the current RSSI source.
+ * @param rssiDbmValue The RSSI value in dBm to set.
+ * @param source The source of the RSSI value.
+ */
 void setRssiDbm(int16_t rssiDbmValue, rssiSource_e source)
 {
     if (source != rssiSource) {
@@ -973,6 +1002,11 @@ void setRssiDbm(int16_t rssiDbmValue, rssiSource_e source)
     rssiDbmRaw = rssiDbmValue;
 }
 
+/**
+ * Updates the raw RSSI dBm value for the inactive antenna and enables diversity mode if the source matches the current RSSI source.
+ * @param rssiDbmValue The RSSI value in dBm for the inactive antenna.
+ * @param source The RSSI source to validate before updating.
+ */
 void setRssiDbmInactive(int16_t rssiDbmValue, rssiSource_e source)
 {
     if (source != rssiSource) {
@@ -982,6 +1016,12 @@ void setRssiDbmInactive(int16_t rssiDbmValue, rssiSource_e source)
     rssiDbmRawInactive = rssiDbmValue;
 }
 
+/**
+ * Sets the RSSI value in dBm directly for the active antenna if the source matches the current RSSI source.
+ * 
+ * @param newRssiDbm The new RSSI value in dBm.
+ * @param source The source of the RSSI value.
+ */
 void setRssiDbmDirect(int16_t newRssiDbm, rssiSource_e source)
 {
     if (source != rssiSource) {

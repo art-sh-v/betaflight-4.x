@@ -67,6 +67,15 @@
 
 const char CRASHFLIP_WARNING[] = ">CRASH FLIP<";
 
+/**
+ * Populates the OSD warning message, blinking flag, and display severity attribute based on current system states and enabled warnings.
+ *
+ * This function checks various flight controller conditions—such as arming status, failsafe, sensor alarms, battery state, link quality, and feature-specific warnings—and updates the provided output parameters to reflect the highest-priority warning to be shown on the OSD. The warning message, whether it should blink, and its severity are determined according to the current configuration and real-time telemetry or sensor data.
+ *
+ * @param warningText Output buffer for the warning message string.
+ * @param blinking Output flag set to true if the warning should blink.
+ * @param displayAttr Output severity attribute for the warning display.
+ */
 void renderOsdWarning(char *warningText, bool *blinking, uint8_t *displayAttr)
 {
     const batteryState_e batteryState = getBatteryState();
