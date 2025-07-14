@@ -1598,10 +1598,10 @@ static void osdElementRssiDbm(osdElementParms_t *element)
     const int16_t osdRssiDbmInactive = getRssiDbmInactive();
     const bool diversity = getIsDiversity();
 
-    if (fmax(osdRssiDbm, osdRssiDbmInactive) < osdConfig()->rssi_dbm_alarm) {
+    if (MAX(osdRssiDbm, osdRssiDbmInactive) < osdConfig()->rssi_dbm_alarm) {
          element->attr = DISPLAYPORT_SEVERITY_CRITICAL;
     } else
-    if (fmin(osdRssiDbm, osdRssiDbmInactive) < osdConfig()->rssi_dbm_alarm) {
+    if (MIN(osdRssiDbm, osdRssiDbmInactive) < osdConfig()->rssi_dbm_alarm) {
         element->attr = DISPLAYPORT_SEVERITY_WARNING;
     }
 
